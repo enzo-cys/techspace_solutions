@@ -13,25 +13,25 @@ const User = {
   // Trouver par ID (sans le password)
   async findById(id) {
     const sql =
-      "SELECT id, email, firstname, lastname, created_at FROM users WHERE id = ?";
+      "SELECT id, email, name, lastname, created_at FROM users WHERE id = ?";
     const results = await query(sql, [id]);
     return results[0] || null;
   },
 
   // Créer un utilisateur
-  async create({ email, password, firstname, lastname }) {
+  async create({ email, password, name, lastname }) {
     const hashedPassword = await bcrypt.hash(password, 10);
     const sql = `
-INSERT INTO users (email, password, firstname, lastname)
+INSERT INTO users (email, password, name, lastname)
 VALUES (?, ?, ?, ?)
 `;
     const result = await query(sql, [
       email.toLowerCase(),
       hashedPassword,
-      firstname,
+      name,
       lastname,
     ]);
-    return { id: result.insertId, email, firstname, lastname };
+    return { id: result.insertId, email, name, lastname };
   },
 
   // Vérifier le mot de passe

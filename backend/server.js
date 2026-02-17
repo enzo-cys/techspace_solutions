@@ -1,18 +1,19 @@
 // server.js
-import "dotenv/config"; // Syntaxe ES Module pour dotenv ⬅️
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { testConnection } from "./config/db.js";
 import authRoutes from "./routes/auth.routes.js";
+import reservationRoutes from "./routes/reservation.routes.js";
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5520;
 
 // Connexion BDD
 testConnection();
 
 // Middlewares
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+app.use(cors({ origin: "http://localhost:5521", credentials: true }));
 app.use(express.json());
 
 // Logger (dev)
@@ -33,6 +34,16 @@ POST    /api/auth/register
 POST    /api/auth/login
 GET     /api/auth/me
 */
+
+/*
+GET     /api/reservations (semaine)
+GET     /api/reservations/user/:userId
+GET     /api/reservations/:id
+POST    /api/reservations
+PUT     /api/reservations/:id
+DELETE  /api/reservations/:id
+*/
+app.use("/api/reservations", reservationRoutes);
 app.use("/api/auth", authRoutes);
 
 // 404

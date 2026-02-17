@@ -12,9 +12,9 @@ const generateToken = (user) => {
 // POST /api/auth/register
 export const register = async (req, res) => {
   try {
-    const { email, password, firstname, lastname } = req.body;
+    const { email, password, name, lastname } = req.body;
 
-    if (!email || !password || !firstname || !lastname) {
+    if (!email || !password || !name || !lastname) {
       return res.status(400).json({ error: "Tous les champs sont requis" });
     }
 
@@ -23,7 +23,7 @@ export const register = async (req, res) => {
       return res.status(409).json({ error: "Email déjà utilisé" });
     }
 
-    const user = await User.create({ email, password, firstname, lastname });
+    const user = await User.create({ email, password, name, lastname });
     const token = generateToken(user);
 
     res.status(201).json({ message: "Inscription réussie", user, token });
@@ -47,7 +47,7 @@ export const login = async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        firstname: user.firstname,
+        name: user.name,
         lastname: user.lastname,
       },
       token,
