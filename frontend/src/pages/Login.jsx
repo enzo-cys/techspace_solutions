@@ -30,37 +30,69 @@ function Login() {
   };
 
   return (
-    <div>
-      <h1>Connexion</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+    <div className="min-h-screen bg-black flex items-center justify-center px-4">
+      <div className="max-w-md w-full">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <img src="/logo.png" alt="TechSpace" className="h-16 mx-auto mb-4" />
+          <h1 className="text-3xl font-bold text-white mb-2">Connexion</h1>
+          <p className="text-gray-400">Accédez au système de réservation</p>
         </div>
-        <div>
-          <label>Mot de passe</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button type="submit" disabled={loading}>
-          {loading ? "Connexion..." : "Se connecter"}
-        </button>
-      </form>
 
-      <p>
-        Pas de compte ? <Link to="/register">S'inscrire</Link>
-      </p>
+        {/* Formulaire */}
+        <div className="bg-zinc-900 rounded-lg p-8 border border-zinc-800">
+          {error && (
+            <div className="bg-red-900/20 border border-red-500 text-red-500 px-4 py-3 rounded mb-6">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-white font-medium mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-4 py-3 bg-black border border-zinc-700 rounded text-white focus:outline-none focus:border-red-500"
+                placeholder="votre@email.com"
+              />
+            </div>
+
+            <div>
+              <label className="block text-white font-medium mb-2">
+                Mot de passe
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full px-4 py-3 bg-black border border-zinc-700 rounded text-white focus:outline-none focus:border-red-500"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-red-600 hover:bg-red-700 disabled:bg-red-800 text-white font-semibold py-3 px-6 rounded transition"
+            >
+              {loading ? "Connexion..." : "Se connecter"}
+            </button>
+          </form>
+
+          <p className="text-center text-gray-400 mt-6">
+            Pas de compte ?{" "}
+            <Link to="/register" className="text-red-500 hover:text-red-400 font-medium">
+              S'inscrire
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

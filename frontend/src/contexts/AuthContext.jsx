@@ -10,36 +10,37 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const authChecking = async () => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      authService
-        .getProfile()
-        .then((data) => setUser(data.user))
-        .catch(() => localStorage.removeItem("token"))
-        .finally(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
-}
+      // Les cookies sont envoyés automatiquement avec credentials: true
+      // Pas besoin de vérifier localStorage
+      try {
+        const data = await authService.getProfile();
+        setUser(data.user);
+      } catch (error) {
+        console.log("Non authentifié");
+      } finally {
+        setLoading(false);
+      }
+    };
     authChecking();
   }, []);
 
   const login = async (email, password) => {
     const data = await authService.login(email, password);
-    localStorage.setItem("token", data.token);
+    // Le JWT est automatiquement en cookie (backend le gère)
     setUser(data.user);
     return data;
   };
 
   const register = async (userData) => {
     const data = await authService.register(userData);
-    localStorage.setItem("token", data.token);
+    // Le JWT est automatiquement en cookie (backend le gère)
     setUser(data.user);
     return data;
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    // Supprimer le cookie
+    document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     setUser(null);
   };
 

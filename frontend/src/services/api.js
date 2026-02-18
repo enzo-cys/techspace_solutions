@@ -3,17 +3,16 @@
 const API_URL = "http://localhost:5520/api";
 
 async function fetchAPI(endpoint, options = {}) {
-  const token = localStorage.getItem("token");
-
   const headers = {
     "Content-Type": "application/json",
-    ...(token && { Authorization: `Bearer ${token}` }),
+    ...options.headers,
   };
 
   try {
     const response = await fetch(`${API_URL}${endpoint}`, {
       ...options,
       headers,
+      credentials: "include", // Important: envoie les cookies automatiquement
     });
 
     const data = await response.json();

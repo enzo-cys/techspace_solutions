@@ -1,9 +1,21 @@
-/* 1 seule ligne ! */
 @import "tailwindcss";
 
-/* Classes réutilisables (optionnel) */
+/* Reset & base styles */
+body {
+  margin: 0;
+  background-color: #000;
+  color: #fff;
+}
+
+/* Classes réutilisables */
 @layer components {
-.btn { @apply px-6 py-2 rounded-lg font-medium transition-all; }
-.btn-primary { @apply bg-indigo-600 text-white hover:bg-indigo-700; }
-.form-input { @apply w-full px-4 py-2 border-2 rounded-lg; }
+  .btn { 
+    @apply px-6 py-2 rounded-lg font-medium transition-all; 
+  }
+  .btn-primary { 
+    @apply bg-red-600 text-white hover:bg-red-700; 
+  }
+  .form-input { 
+    @apply w-full px-4 py-3 bg-black border border-zinc-700 rounded text-white focus:outline-none focus:border-red-500; 
+  }
 }

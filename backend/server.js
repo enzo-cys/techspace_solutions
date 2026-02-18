@@ -13,8 +13,28 @@ const PORT = process.env.PORT || 5520;
 testConnection();
 
 // Middlewares
-app.use(cors({ origin: "http://localhost:5521", credentials: true }));
+app.use(
+  cors({
+    origin: "http://localhost:5521",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 app.use(express.json());
+
+// Middleware pour parser les cookies
+app.use((req, res, next) => {
+  const cookies = {};
+  if (req.headers.cookie) {
+    req.headers.cookie.split(";").forEach((cookie) => {
+      const [name, value] = cookie.trim().split("=");
+      cookies[name] = decodeURIComponent(value);
+    });
+  }
+  req.cookies = cookies;
+  next();
+});
 
 // Logger (dev)
 if (process.env.NODE_ENV !== "production") {

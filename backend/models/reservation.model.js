@@ -28,7 +28,9 @@ const Reservation = {
   // Trouver les réservations par ID utilisateur
   async findByUserId(userId) {
     const sql = `
-      SELECT * FROM reservations 
+      SELECT r.*, u.name, u.lastname, u.email 
+      FROM reservations r 
+      JOIN users u ON r.user_id = u.id
       WHERE user_id = ? 
       ORDER BY start_date ASC
     `;

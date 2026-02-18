@@ -82,11 +82,16 @@ export const createReservation = async (req, res) => {
       return res.status(400).json({ error: "Durée minimale: 1 heure" });
     }
 
-    // Vérifier les horaires (8h-19h)
-    if (startDate.getHours() < 8 || endDate.getHours() > 19) {
+    // Vérifier les horaires (début 8h-18h, fin max 19h)
+    if (startDate.getHours() < 8 || startDate.getHours() > 18) {
       return res
         .status(400)
-        .json({ error: "Horaires entre 8h et 19h uniquement" });
+        .json({ error: "Heure de début entre 8h et 18h" });
+    }
+    if (endDate.getHours() < 8 || endDate.getHours() > 19) {
+      return res
+        .status(400)
+        .json({ error: "Heure de fin entre 8h et 19h" });
     }
 
     // Vérifier lundi-vendredi
@@ -111,9 +116,12 @@ export const createReservation = async (req, res) => {
       userId,
     });
 
+    // Retourner la réservation avec les données utilisateur jointes
+    const fullReservation = await Reservation.findById(reservation.id);
+
     res.status(201).json({
       message: "Réservation créée avec succès",
-      reservation,
+      reservation: fullReservation,
     });
   } catch (error) {
     console.error("Erreur création réservation:", error);
@@ -201,9 +209,17 @@ export const deleteReservation = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    // Vérifier que c'est le propriétaire
-    const isOwner = await Reservation.isOwner(id, userId);
-    if (!isOwner) {
+    // Récupérer la réservation
+    const reservation = await Reservation.findById(id);
+    if (!reservation) {
+      return res.status(404).json({ error: "Réservation non trouvée" });
+    }
+
+    // Vérifier: soit c'est le propriétaire, soit la réservation a été créée par un compte anonyme
+    const isOwner = reservation.user_id === userId;
+    const isAnonymous = reservation.email && reservation.email.startsWith("anonyme-");
+
+    if (!isOwner && !isAnonymous) {
       return res
         .status(403)
         .json({ error: "Vous ne pouvez supprimer que vos réservations" });
