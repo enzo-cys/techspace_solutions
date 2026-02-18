@@ -1,4 +1,4 @@
-# 📋 TechSpace Solutions - Système de Réservation de Salle
+# TechSpace Solutions - Système de Réservation de Salle
 
 Un système moderne et efficace de gestion de réservation de salle de réunion avec interface web intuitive et backend sécurisé.
 
