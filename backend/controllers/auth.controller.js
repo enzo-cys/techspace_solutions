@@ -4,14 +4,21 @@ import User from "../models/user.model.js";
 import { query } from "../config/db.js";
 import bcrypt from "bcrypt";
 
-// Génère un token JWT
+/**
+ * Génère un token JWT signé avec l'ID et l'email de l'utilisateur
+ * @param {Object} user - Objet utilisateur avec id et email
+ * @returns {string} Token JWT signé
+ */
 const generateToken = (user) => {
   return jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN || "7d",
   });
 };
 
-// POST /api/auth/register
+/**
+ * POST /api/auth/register
+ * Crée un nouvel utilisateur et envoie un JWT en cookie httpOnly
+ */
 export const register = async (req, res) => {
   try {
     const { email, password, name, lastname } = req.body;
@@ -51,7 +58,10 @@ export const register = async (req, res) => {
   }
 };
 
-// POST /api/auth/login
+/**
+ * POST /api/auth/login
+ * Authentifie un utilisateur et envoie un JWT en cookie httpOnly
+ */
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -86,21 +96,33 @@ export const login = async (req, res) => {
   }
 };
 
-// GET /api/auth/me
+/**
+ * GET /api/auth/me
+ * Retourne le profil de l'utilisateur actuellement authentifié
+ */
 export const getProfile = async (req, res) => {
   res.json({ user: req.user });
 };
 
-// POST /api/auth/anonymize - Anonymiser le compte (RGPD)
+/**
+ * POST /api/auth/anonymize
+ * Anonymise complètement un compte utilisateur (RGPD Article 17)
+ * - Remplace les informations personnelles par des valeurs anonymes
+ * - Change le password pour rendre le compte inaccessible
+ * - Supprime le JWT en effaçant le cookie
+ * Après anonymisation, l'utilisateur ne peut plus se connecter
+ */
 export const anonymize = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Anonymiser les données personnelles
+    // Données anonymisées: pattern "Anonyme-{userId}" et "anonyme-{userId}@anonymized.local"
+    // Ces patterns sont utilisés partout dans le code pour détecter les comptes supprimés
     const anonymizedName = `Anonyme-${userId}`;
     const anonymizedEmail = `anonyme-${userId}@anonymized.local`;
 
-    // Générer un password inaccessible pour que l'utilisateur ne puisse pas se reconnecter
+    // Générer un hash de password aléatoire basé sur l'heure pour rendre le compte inaccessible
+    // Même si quelqu'un connaît l'ancien password, il ne peut pas se connecter
     const inaccessiblePassword = await bcrypt.hash(
       `deleted-${userId}-${Date.now()}`,
       10,
@@ -119,7 +141,9 @@ export const anonymize = async (req, res) => {
       userId,
     ]);
 
-    // Invalider le JWT en supprimant le cookie
+    // Invalider immédiatement le JWT en supprimant le cookie
+    // Le middleware auth.middleware.js vérifiera aussi que l'email commence par "anonyme-"
+    // pour une double protection contre les anciens tokens
     res.clearCookie("token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

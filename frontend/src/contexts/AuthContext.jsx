@@ -1,4 +1,13 @@
-// contexts/AuthContext.jsx
+/**
+ * Context d'authentification globale de l'application
+ * Gère l'authentification via JWT stocké en cookies httpOnly
+ * 
+ * Flux:
+ * - Au mount: vérifie si l'utilisateur est connecté via GET /api/auth/me
+ * - Les cookies sont automatiquement envoyés par le navigateur (credentials: include)
+ * - Pas besoin de localStorage
+ * - logout() supprime le cookie manuellement
+ */
 import { createContext, useState, useEffect } from "react";
 import { authService } from "../services/api.js";
 

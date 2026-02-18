@@ -1,4 +1,16 @@
-// pages/Dashboard.jsx
+/**
+ * Page Dashboard - Calendrier de réservation de salle
+ * 
+ * Affiche un calendrier hebdomadaire (lun-ven) avec créneaux horaires (8h-18h)
+ * Permet de créer, modifier et supprimer des réservations
+ * 
+ * Logique:
+ * - Au Load: récupère les réservations de la semaine courante
+ * - Click sur créneau libre: modal de création
+ * - Click sur créneau réservé (mine ou anonyme): modal d'édition
+ * - Les horaires vont de 8h à 18h (affiché), fin possible jusqu'à 19h
+ * - Validation: durée >= 1h, lun-ven uniquement, pas dans le passé
+ */
 import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth.js";
 import { reservationService } from "../services/api.js";
