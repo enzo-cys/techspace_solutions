@@ -11,7 +11,11 @@ export const getWeekReservations = async (req, res) => {
     const monday = new Date(today.setDate(diff));
     monday.setHours(0, 0, 0, 0);
 
-    const dateStr = monday.toISOString().split("T")[0];
+    // Utiliser une date locale pour éviter les décalages UTC
+    const year = monday.getFullYear();
+    const month = String(monday.getMonth() + 1).padStart(2, "0");
+    const day = String(monday.getDate()).padStart(2, "0");
+    const dateStr = `${year}-${month}-${day}`;
     const reservations = await Reservation.findByWeek(dateStr);
 
     res.json({ reservations });
@@ -84,14 +88,10 @@ export const createReservation = async (req, res) => {
 
     // Vérifier les horaires (début 8h-18h, fin max 19h)
     if (startDate.getHours() < 8 || startDate.getHours() > 18) {
-      return res
-        .status(400)
-        .json({ error: "Heure de début entre 8h et 18h" });
+      return res.status(400).json({ error: "Heure de début entre 8h et 18h" });
     }
     if (endDate.getHours() < 8 || endDate.getHours() > 19) {
-      return res
-        .status(400)
-        .json({ error: "Heure de fin entre 8h et 19h" });
+      return res.status(400).json({ error: "Heure de fin entre 8h et 19h" });
     }
 
     // Vérifier lundi-vendredi
@@ -217,7 +217,8 @@ export const deleteReservation = async (req, res) => {
 
     // Vérifier: soit c'est le propriétaire, soit la réservation a été créée par un compte anonyme
     const isOwner = reservation.user_id === userId;
-    const isAnonymous = reservation.email && reservation.email.startsWith("anonyme-");
+    const isAnonymous =
+      reservation.email && reservation.email.startsWith("anonyme-");
 
     if (!isOwner && !isAnonymous) {
       return res

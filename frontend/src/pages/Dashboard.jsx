@@ -80,19 +80,18 @@ function Dashboard() {
     const slotDate = new Date(date);
     slotDate.setHours(hour, 0, 0, 0);
 
-    // Vérifier si c'est dans le passé
-    if (slotDate < now) {
+    // Vérifier si déjà réservé (utiliser la même logique que isSlotReserved)
+    const existing = isSlotReserved(dayIndex, hour);
+    const isMine = existing && existing.user_id === user.id;
+    const isAnonymous = existing && existing.email && existing.email.startsWith("anonyme-");
+
+    // Bloquer les créneaux passés sauf si c'est ma réservation ou une réservation anonyme
+    if (slotDate < now && !isMine && !isAnonymous) {
       return;
     }
 
-    // Vérifier si déjà réservé (utiliser la même logique que isSlotReserved)
-    const existing = isSlotReserved(dayIndex, hour);
-
     if (existing) {
       // Vérifier si c'est ma réservation ou une réservation anonyme
-      const isMine = existing.user_id === user.id;
-      const isAnonymous = existing.email && existing.email.startsWith("anonyme-");
-      
       if (isMine || isAnonymous) {
         const startD = new Date(existing.start_date);
         const endD = new Date(existing.end_date);
@@ -259,13 +258,15 @@ function Dashboard() {
                     const reserved = isSlotReserved(dayIdx, hour);
                     const past = isPast(dayIdx, hour);
                     const isMine = reserved && reserved.user_id === user.id;
+                    const isAnonymous = reserved && reserved.email && reserved.email.startsWith("anonyme-");
+                    const canEditPast = past && reserved && (isMine || isAnonymous);
 
                     return (
                       <td
                         key={dayIdx}
-                        onClick={() => !past && handleSlotClick(dayIdx, hour)}
+                        onClick={() => handleSlotClick(dayIdx, hour)}
                         className={`px-2 py-2 text-center cursor-pointer transition ${
-                          past
+                          past && !canEditPast
                             ? "bg-zinc-800 cursor-not-allowed"
                             : reserved
                             ? isMine
